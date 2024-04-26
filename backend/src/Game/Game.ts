@@ -1,18 +1,22 @@
 import { Chess } from "chess.js";
-import { GAME_OVER, MOVE } from "./message.js";
-
+import { GAME_OVER,MOVE } from "./message";
+import { WebSocket } from "ws";
+interface MOVE{
+  to:string,
+  from:string
+}
 export class Game {
-  board;
-  moves = [];
+  private board:Chess;
+  private moves:MOVE[];
   player1;
   player2;
-  constructor(player1, player2) {
+  constructor(player1:WebSocket, player2:WebSocket) {
     this.player1 = player1;
     this.player2 = player2;
     this.board = new Chess();
     this.moves = [];
   }
-  makeMove(socket, move) {
+  makeMove(socket:WebSocket, move:{from:string,to:string}) {
     if (this.board.turn() === "w" && this.player1 !== socket) {
       return;
     }

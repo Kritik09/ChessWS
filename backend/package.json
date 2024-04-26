@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "type": "module",
   "scripts": {
-    "start": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node dist/index.js",
+    "build": "tsc -p .",
+    "dev": "tsc-watch --onSuccess \"npm start\""
   },
   "keywords": [],
   "author": "",
@@ -14,5 +14,10 @@
   "dependencies": {
     "chess.js": "^1.0.0-beta.8",
     "ws": "^8.16.0"
+  },
+  "devDependencies": {
+    "@types/chess.js": "^0.13.7",
+    "@types/ws": "^8.5.10",
+    "tsc-watch": "^6.2.0"
   }
 }

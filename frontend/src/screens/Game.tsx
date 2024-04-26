@@ -1,19 +1,23 @@
 import { useEffect, useState } from "react";
-import { GAME_STARTED, INIT_GAME, MOVE } from "../../../backend/src/message";
+export const INIT_GAME = "init_game";
+export const MOVE = "move";
+export const GAME_OVER = "game_over";
+export const IN_QUEUE = "in_queue";
+export const GAME_STARTED = "game_started";
 import ChessBoard from "../components/ChessBoard";
 import { useSocket } from "../hooks/useSocket";
 import { BLACK, WHITE } from "../utils/constants";
 import { Chess } from "chess.js";
-
 export default function Game() {
   const socket = useSocket();
   const [chess] = useState(new Chess());
-  const [board, setBoard] = useState();
+  const [board, setBoard] = useState(chess.board());
   const [isTurn, setIsTurn] = useState(false);
-  const [myColor, setMyColor] = useState(BLACK);
-  const [movesPlayed, setMovesPlayed] = useState([]);
+  const [myColor, setMyColor] = useState<string>(BLACK);
+  const [movesPlayed, setMovesPlayed] = useState<{ to: string, from: string }[]>([]);
+  const [started, setStarted] = useState(false);
   const startGame = () => {
-    socket.send(
+    socket?.send(
       JSON.stringify({
         type: INIT_GAME,
       })
@@ -28,7 +32,9 @@ export default function Game() {
         if (message.color === WHITE) {
           setMyColor(WHITE);
           setIsTurn(true);
+          setBoard(chess.board())
         }
+        setStarted(true);
       }
       if (message.type === MOVE) {
         const move = message.payload.move;
@@ -43,7 +49,7 @@ export default function Game() {
   return (
     <div className="flex justify-evenly p-4 w-screen h-screen">
       <div className="">
-        {!board ? (
+        {!started ? (
           <h1 className="text-white font-extrabold text-2xl">Find Board</h1>
         ) : (
           <div className={(myColor === BLACK ? "rotate-180" : "") + " p-2"}>
@@ -55,14 +61,13 @@ export default function Game() {
               isTurn={isTurn}
               setIsTurn={setIsTurn}
               myColor={myColor}
-              movesPlayed={movesPlayed}
               setMovesPlayed={setMovesPlayed}
             />
           </div>
         )}
       </div>
       <div className="">
-        {board ? (
+        {started ? (
           <div className="my-4 h-3/4 flex flex-col w-full bg-slate-400">
             <div className="flex justify-between">
               <div className="px-5">
@@ -76,9 +81,8 @@ export default function Game() {
               {movesPlayed.map((moves, index) => {
                 return (
                   <div
-                    className={`py-2 flex justify-between ${
-                      index % 2 ? "bg-slate-500" : "bg-slate-600"
-                    }`}
+                    className={`py-2 flex justify-between ${index % 2 ? "bg-slate-500" : "bg-slate-600"
+                      }`}
                     key={index}
                   >
                     <div className="px-5">

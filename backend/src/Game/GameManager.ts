@@ -1,15 +1,23 @@
-import { Game } from "./Game.js";
-import { GAME_STARTED, INIT_GAME, IN_QUEUE, MOVE } from "./message.js";
+import { WebSocket } from "ws";
+import {Game} from "./Game"
+export const INIT_GAME = "init_game";
+export const MOVE = "move";
+export const GAME_OVER = "game_over";
+export const IN_QUEUE = "in_queue";
+export const GAME_STARTED = "game_started";
 
 export class GameManager {
-  games = [];
-  pendingUser = null;
-  constructor() {}
-  addUser(socket) {
+  private games:Game[];
+  private pendingUser:WebSocket|null;
+  constructor() {
+    this.games=[]
+    this.pendingUser=null
+  }
+  addUser(socket:WebSocket) {
     this.addHandler(socket);
   }
-  removeUser(socket) {}
-  addHandler(socket) {
+  removeUser(socket:WebSocket) {}
+  addHandler(socket:WebSocket) {
     socket.on("message", (data) => {
       const message = JSON.parse(data.toString());
       if (message.type === INIT_GAME) {
